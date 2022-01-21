@@ -1,0 +1,1 @@
+Repo for training solidity and related technologies.
