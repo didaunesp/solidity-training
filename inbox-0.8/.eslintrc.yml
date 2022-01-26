@@ -1,0 +1,14 @@
+env:
+  browser: true
+  es2021: true
+extends: 
+  - eslint:recommended
+  - stylelint-config-prettier
+parserOptions:
+  ecmaVersion: latest
+  sourceType: script
+rules: {
+  'prettier/prettier': 'error',
+  'import/prefer-default-export': 'off',
+  'jsx-quotes': ['error', 'prefer-single']
+}
