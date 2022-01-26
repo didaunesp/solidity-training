@@ -2,22 +2,31 @@ const assert = require('assert')
 const ganache = require('ganache-cli')
 const Web3 = require('web3')
 const web3 = new Web3(ganache.provider())
-const { abi, evm } = require('../compile')
+const compile = require('../compile')
 
 let inbox
 let accounts
 
-beforeEach(async () => {
-  // Get a list of all accounts
-  accounts = await web3.eth.getAccounts()
-
-  // Use one of those accounts to deploy the contract
-  inbox = await new web3.eth.Contract(abi)
-    .deploy({ data: evm.bytecode.object, arguments: ['Hi there!'] })
-    .send({ from: accounts[0], gas: '1000000' })
-})
+let buildedContract
+let abi, evm
 
 describe('Inbox testing', async () => {
+  before(async () => {
+    buildedContract = await compile('Inbox')
+    abi = buildedContract.abi
+    evm = buildedContract.evm
+  })
+
+  beforeEach(async () => {
+    // Get a list of all accounts
+    accounts = await web3.eth.getAccounts()
+
+    // Use one of those accounts to deploy the contract
+    inbox = await new web3.eth.Contract(abi)
+      .deploy({ data: evm.bytecode.object, arguments: ['Hi there!'] })
+      .send({ from: accounts[0], gas: '1000000' })
+  })
+
   it('Deploys a contract', () => {
     assert.ok(inbox.options.address)
   })
