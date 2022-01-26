@@ -3,7 +3,7 @@ const Web3 = require('web3')
 const { interface, bytecode } = require('./compile')
 
 if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
+  require('dotenv').config({ path: '../.env' })
 }
 const nodeUrl = process.env.NODE_URL
 const privateKey = process.env.PRIVATE_KEY
@@ -12,8 +12,8 @@ if (!nodeUrl || !privateKey) {
   console.log('Create a .env file with NODE_URL and PRIVATE_KEY variables')
 } else {
   const provider = new HDWalletProvider(
-    process.env.NODE_URL,
-    process.env.PRIVATE_KEY
+    process.env.PRIVATE_KEY,
+    process.env.NODE_URL
   )
 
   const web3 = new Web3(provider)
