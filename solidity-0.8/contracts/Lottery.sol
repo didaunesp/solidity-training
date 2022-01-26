@@ -11,10 +11,20 @@ contract Lottery {
     }
 
     function enter() public payable {
+        require(msg.value == .01 ether);
         players.push(msg.sender);
     }
     
-    function pickwinner() public {
+    function pickWinner() public payable {
+        require(msg.sender == manager);
 
+        uint index = (random() % players.length);
+        address payable self = payable(address(this));
+        address payable winner = payable(players[index]);
+        winner.transfer(self.balance);
+    }
+
+    function random() private view returns(uint){
+        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players)));
     }
 }
