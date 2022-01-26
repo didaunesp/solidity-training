@@ -76,7 +76,42 @@ describe('Lottery testing', async () => {
     assert.equal(players[1], accounts[2])
   })
 
-  //   it('Pick winner', async () => {
-  //     assert.equal(true, true)
-  //   })
+  it('Only manager can pick winner', async () => {
+    try {
+      const test = await lottery.methods
+        .pickWinner()
+        .send({ from: accounts[1] })
+      assert(false)
+    } catch (err) {
+      assert(err)
+    }
+  })
+
+  it('PickWinner Sends money to the winner', async () => {
+    await lottery.methods
+      .enter()
+      .send({ from: accounts[1], value: web3.utils.toWei('0.01', 'ether') })
+
+    const initialBalance = await web3.eth.getBalance(accounts[1])
+
+    await lottery.methods.pickWinner().send({ from: accounts[0] })
+
+    const finalBalance = await web3.eth.getBalance(accounts[1])
+
+    const profit = finalBalance - initialBalance
+
+    assert.equal(profit, web3.utils.toWei('0.01', 'ether'))
+  })
+
+  it('PickWinner resets the players array ', async () => {
+    await lottery.methods
+      .enter()
+      .send({ from: accounts[1], value: web3.utils.toWei('0.01', 'ether') })
+
+    await lottery.methods.pickWinner().send({ from: accounts[0] })
+
+    const players = await lottery.methods.getPlayers().call()
+
+    assert.equal(players.length, 0)
+  })
 })
