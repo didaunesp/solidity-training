@@ -14,11 +14,11 @@ describe('Lottery testing', async () => {
     buildedContract = await compile('Lottery')
     abi = buildedContract.abi
     evm = buildedContract.evm
+
+    accounts = await web3.eth.getAccounts()
   })
 
   beforeEach(async () => {
-    // Get a list of all accounts
-    accounts = await web3.eth.getAccounts()
     // Use one of those accounts to deploy the contract
     lottery = await new web3.eth.Contract(abi)
       .deploy({ data: evm.bytecode.object })
@@ -35,16 +35,36 @@ describe('Lottery testing', async () => {
   })
 
   it('submits enter', async () => {
-    const txId = await lottery.methods.enter().send({ from: accounts[1] })
+    const txId = await lottery.methods
+      .enter()
+      .send({ from: accounts[1], value: web3.utils.toWei('0.01', 'ether') })
     assert.ok(txId)
   })
 
   it('enter player', async () => {
-    const txId = await lottery.methods.enter().send({ from: accounts[1] })
+    await lottery.methods
+      .enter()
+      .send({ from: accounts[1], value: web3.utils.toWei('0.01', 'ether') })
 
     const player = await lottery.methods.players(0).call()
 
     assert.equal(player, accounts[1])
+  })
+
+  it('get players', async () => {
+    await lottery.methods
+      .enter()
+      .send({ from: accounts[1], value: web3.utils.toWei('0.01', 'ether') })
+
+    await lottery.methods
+      .enter()
+      .send({ from: accounts[2], value: web3.utils.toWei('0.01', 'ether') })
+
+    const players = await lottery.methods.getPlayers().call()
+
+    assert.equal(players.length, 2)
+    assert.equal(players[0], accounts[1])
+    assert.equal(players[1], accounts[2])
   })
 
   //   it('Pick winner', async () => {
