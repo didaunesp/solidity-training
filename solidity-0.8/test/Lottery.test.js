@@ -51,6 +51,15 @@ describe('Lottery testing', async () => {
     assert.equal(player, accounts[1])
   })
 
+  it('requiers a minimum amount of ether to enter', async () => {
+    try {
+      await lottery.methods.enter().send({ from: accounts[1], value: 0 })
+      assert(false)
+    } catch (err) {
+      assert(err)
+    }
+  })
+
   it('get players', async () => {
     await lottery.methods
       .enter()
